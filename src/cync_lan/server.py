@@ -136,6 +136,8 @@ class nCyncServer:
             )
             return
         state = raw_state[1]
+        # Normalize state: 0 = off, any non-zero value = on (1)
+        state = 1 if state != 0 else 0
         brightness = raw_state[2]
         temp = raw_state[3]
         r = raw_state[4]

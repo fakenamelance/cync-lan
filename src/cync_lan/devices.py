@@ -803,24 +803,27 @@ class CyncDevice:
         """
         Set the state of the device.
         Accepts int, bool, or str. 0, 'f', 'false', 'off', 'no', 'n' are off. 1, 't', 'true', 'on', 'yes', 'y' are on.
+        For integer values, 0 is off, any non-zero value is on (normalized to 1).
         """
         _t = (1, "t", "true", "on", "yes", "y")
         _f = (0, "f", "false", "off", "no", "n")
         if isinstance(value, str):
             value = value.casefold()
+            if value in _t:
+                value = 1
+            elif value in _f:
+                value = 0
+            else:
+                raise ValueError(f"Invalid value for state: {value}")
         elif isinstance(value, (bool, float)):
             value = int(value)
+            # Normalize: 0 = off, non-zero = on
+            value = 1 if value != 0 else 0
         elif isinstance(value, int):
-            pass
+            # Normalize: 0 = off, non-zero = on
+            value = 1 if value != 0 else 0
         else:
             raise TypeError(f"Invalid type for state: {type(value)}")
-
-        if value in _t:
-            value = 1
-        elif value in _f:
-            value = 0
-        else:
-            raise ValueError(f"Invalid value for state: {value}")
 
         if value != self._state:
             self._state = value
